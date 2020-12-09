@@ -22,7 +22,6 @@ public class Main {
 
 		Node noInicio = null;
 		Node noFim = null;
-		// initialize the graph base on the Romania map
 		// DISTANCIA HEURISTICA
 		Node n1 = null;
 		Node n2 = null;
@@ -411,7 +410,7 @@ public class Main {
 		Set<Node> explored = new HashSet<Node>();
 
 		PriorityQueue<Node> queue = new PriorityQueue<Node>(20, new Comparator<Node>() {
-			// override compare method
+			// substituir método de comparação
 			public int compare(Node i, Node j) {
 				if (i.f_scores > j.f_scores) {
 					return 1;
@@ -434,8 +433,30 @@ public class Main {
 		queue.add(source);
 
 		boolean found = false;
+		
+		
+		List<NodeRepetido> listaDeNosRepetidos = new ArrayList<NodeRepetido>();
+	
+	
 
 		while ((!queue.isEmpty()) && (!found)) {
+			System.out.println("  ");
+			for(Node s : queue) {					
+				System.out.println("FRONTEIRAS: "+s.value+" f(n): "+s.f_scores);
+				
+			}
+			if(listaDeNosRepetidos != null && listaDeNosRepetidos.size()>0) {
+				//System.out.println("FRONTEIRAS2: "+queuess.element().value+" f(n): "+queuess.element().f_scores);
+				for(NodeRepetido x : listaDeNosRepetidos) {
+					System.out.println("FRONTEIRAS: "+x.value+" f(n): "+x.f_scores);					
+				
+			}
+				
+			}
+				     
+				
+				//System.out.println("FRONTEIRAS: "+queue.element());
+
 
 			// the node in having the lowest f_score value
 			Node current = queue.poll();
@@ -454,16 +475,17 @@ public class Main {
 				System.out.println("Tempo de viagem: " + (current.g_scores / 30) * 60 + " Minutos");
 
 			} else {
+				
 				System.out.println(
 						"********************************************************************************************************");
 				System.out.println("Nó atual ------- " + current.value + " --------"
 						+ "Valor do nó inicial até o nó atual: " + current.g_scores);
 
 			}
+			
+			
 
-			// check every child of current node
-			int i = 0;
-
+			// verifique cada filho do nó atual
 			for (Edge e : current.adjacencies) {
 				Node child = e.target;
 				double cost = e.cost;
@@ -471,7 +493,7 @@ public class Main {
 				double temp_f_scores = temp_g_scores + child.h_scores;
 
 				/*
-				 * if child node has been evaluated and the newer f_score is higher, skip
+				 *  se o nó filho foi avaliado e o f_score mais recente é maior, pule
 				 */
 
 				if ((explored.contains(child)) && (temp_f_scores >= child.f_scores)) {
@@ -479,7 +501,7 @@ public class Main {
 				}
 
 				/*
-				 * else if child node is not in queue or newer f_score is lower
+				 * senão se o nó filho não estiver na fila ou o f_score for menor
 				 */
 
 				else if ((!queue.contains(child)) || (temp_f_scores < child.f_scores)) {
@@ -495,6 +517,21 @@ public class Main {
 					queue.add(child);
 
 				}
+				else if(queue.contains(child)) {
+					
+
+					/*if (queue.contains(child)) {
+						queue.remove(child);
+					}
+					*/
+					
+					NodeRepetido noRepetido = new NodeRepetido(child.value, temp_g_scores, temp_f_scores);
+					
+					listaDeNosRepetidos.add(noRepetido);
+
+					//queue.add(child);
+					
+				}
 
 				if (found) {
 
@@ -506,7 +543,6 @@ public class Main {
 
 				}
 
-				i++;
 
 			}
 
@@ -516,6 +552,24 @@ public class Main {
 
 }
 
+class NodeRepetido{
+	public final String value;
+	public double g_scores;
+	public final double h_scores;
+	public double f_scores;
+	
+
+	public NodeRepetido(String val, double hVal, double f) {
+		value = val;
+		h_scores = hVal;
+		f_scores = f;
+	}
+
+	public String toString() {
+		return value;
+	}
+	
+}
 class Node {
 
 	public final String value;
